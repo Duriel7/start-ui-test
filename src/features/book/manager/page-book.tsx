@@ -25,6 +25,11 @@ import {
   PageLayoutTopBar,
   PageLayoutTopBarTitle,
 } from '@/layout/manager/page-layout';
+import { Button } from '@/components/ui/button';
+//My imports
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { useLocalStorageState } from '@/hooks/use-local-storage';
 
 export const PageBook = (props: { params: { id: string } }) => {
   const { t } = useTranslation(['book']);
@@ -69,6 +74,21 @@ export const PageBook = (props: { params: { id: string } }) => {
       toast.error(t('book:manager.detail.deleteError'));
     }
   };
+
+  //Start of my code
+  const storageKey = `book-review-${props.params.id}`;
+  const [review, setReview] = useLocalStorageState(
+    `book-review-${props.params.id}`,
+    ''
+  );
+  React.useEffect(() => {
+    window.localStorage.setItem(storageKey, review);
+  }, [review, storageKey]);
+
+  const MAX_CHARS = 200;
+  const charactersLeft = MAX_CHARS - review.length;
+  const isOverLimit = charactersLeft < 0;
+  //End of my code
 
   return (
     <PageLayout>
@@ -121,7 +141,7 @@ export const PageBook = (props: { params: { id: string } }) => {
             ))
             .match('default', ({ book }) => (
               <>
-                {book.title} - {book.author}
+                {book.title} - {book.author} : {book.genre?.name}
               </>
             ))
             .exhaustive()}
@@ -161,6 +181,58 @@ export const PageBook = (props: { params: { id: string } }) => {
                           {t('book:common.publisher.label')}
                         </dt>
                         <dd className="flex-1">{book.publisher}</dd>
+                      </div>
+                      <div className="flex flex-col gap-2 py-3">
+                        <dt className="w-24 flex-none font-medium text-muted-foreground">
+                          {'Écrire un avis'}
+                        </dt>
+                        <dd className="flex flex-1 flex-col gap-2">
+                          <Input
+                            placeholder="Votre avis..."
+                            value={review}
+                            onChange={(e) => setReview(e.target.value)}
+                            className={isOverLimit ? 'border-destructive' : ''} //red border is overflow
+                          />
+                          <div className="mt-1 flex items-center justify-between">
+                            <p
+                              className={`text-xs ${isOverLimit ? 'font-bold text-destructive' : 'text-muted-foreground'}`}
+                            >
+                              {isOverLimit
+                                ? `Limite dépassée de ${Math.abs(charactersLeft)} caractères`
+                                : `${charactersLeft} caractères restants`}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="xs"
+                              variant="secondary"
+                              onClick={() =>
+                                isOverLimit
+                                  ? toast.error('Trop long!')
+                                  : toast.success(
+                                      'Avis sauvegardé dans le navigateur !'
+                                    )
+                              }
+                            >
+                              Valider
+                            </Button>
+                            <Button
+                              size="xs"
+                              variant="ghost"
+                              onClick={() => setReview('')}
+                            >
+                              Effacer
+                            </Button>
+                          </div>
+                        </dd>
+                      </div>
+                      <div className="flex gap-4 py-3">
+                        <dt className="w-24 flex-none font-medium text-muted-foreground">
+                          {'Mon avis (Brouillon)'}
+                        </dt>
+                        <dd className="flex-1 text-muted-foreground italic">
+                          {review || 'Aucun avis en cours de rédaction.'}
+                        </dd>
                       </div>
                     </dl>
                   </CardContent>
