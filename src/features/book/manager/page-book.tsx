@@ -2,17 +2,24 @@ import { getUiState } from '@bearstudio/ui-state';
 import { ORPCError } from '@orpc/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertCircleIcon, PencilLineIcon, Trash2Icon } from 'lucide-react';
+//My imports
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { Link } from '@tanstack/react-router';
+//End of my imports
 
 import { orpc } from '@/lib/orpc/client';
+import { useLocalStorageState } from '@/hooks/use-local-storage';
 import { useNavigateBack } from '@/hooks/use-navigate-back';
 
 import { BackButton } from '@/components/back-button';
 import { PageError } from '@/components/errors/page-error';
+import { Button } from '@/components/ui/button';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Card, CardContent } from '@/components/ui/card';
 import { ConfirmResponsiveDrawer } from '@/components/ui/confirm-responsive-drawer';
+import { Input } from '@/components/ui/input';
 import { ResponsiveIconButton } from '@/components/ui/responsive-icon-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
@@ -25,11 +32,6 @@ import {
   PageLayoutTopBar,
   PageLayoutTopBarTitle,
 } from '@/layout/manager/page-layout';
-import { Button } from '@/components/ui/button';
-//My imports
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { useLocalStorageState } from '@/hooks/use-local-storage';
 
 export const PageBook = (props: { params: { id: string } }) => {
   const { t } = useTranslation(['book']);
@@ -168,7 +170,17 @@ export const PageBook = (props: { params: { id: string } }) => {
                         <dt className="w-24 flex-none font-medium text-muted-foreground">
                           {t('book:common.author.label')}
                         </dt>
-                        <dd className="flex-1">{book.author}</dd>
+                        {/* The new code to render a clickable author name that allows automatic research */}
+                        <dd className="flex-1">
+                          <Link
+                            to="/manager/books"
+                            search={{ searchTerm: book.author }}
+                            className="font-medium text-primary transition-colors hover:underline"
+                          >
+                            {book.author}
+                          </Link>
+                        </dd>
+                        {/*<dd className="flex-1">{book.author}</dd>*/}
                       </div>
                       <div className="flex gap-4 py-3">
                         <dt className="w-24 flex-none font-medium text-muted-foreground">
