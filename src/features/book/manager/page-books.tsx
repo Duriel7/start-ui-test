@@ -1,7 +1,7 @@
 import { getUiState } from '@bearstudio/ui-state';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { Link, useRouter } from '@tanstack/react-router';
-import { PlusIcon } from 'lucide-react';
+import { Link, useNavigate, useRouter } from '@tanstack/react-router';
+import { Dice5Icon, PlusIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { orpc } from '@/lib/orpc/client';
@@ -55,6 +55,23 @@ export const PageBooks = (props: { search: { searchTerm?: string } }) => {
     })
   );
 
+  //Start of my code
+  const navigate = useNavigate(); //used to send user to a random book
+  const books = booksQuery.data?.pages.flatMap((p) => p.items) ?? []; //use extracted data from previous query
+
+  const handleRandomBook = () => {
+    if (!books.length) return; //security line
+    const randomBook = books[Math.floor(Math.random() * books.length)]; //native JS random method
+
+    if (!randomBook) return; //security line
+    //navigation block
+    navigate({
+      to: '/manager/books/$id',
+      params: { id: randomBook.id },
+    });
+  };
+  //End of my code
+
   const ui = getUiState((set) => {
     if (booksQuery.status === 'pending') return set('pending');
     if (booksQuery.status === 'error') return set('error');
@@ -100,6 +117,15 @@ export const PageBooks = (props: { search: { searchTerm?: string } }) => {
           size="sm"
           className="max-w-2xs max-md:hidden"
         />
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleRandomBook}
+          disabled={!books.length}
+        >
+          <Dice5Icon className="size-4" />
+          Suggest me a random book !
+        </Button>
       </PageLayoutTopBar>
       <PageLayoutContent className="pb-20">
         <DataList>
