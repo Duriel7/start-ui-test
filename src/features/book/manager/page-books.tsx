@@ -61,7 +61,8 @@ export const PageBooks = (props: { search: { searchTerm?: string } }) => {
 
   const handleRandomBook = () => {
     if (!books.length) return; //security line
-    // eslint-disable-next-line sonarjs/pseudo-random => no need for crytography here, disabling the linter just for this line
+    //No need for crytography here, disabling the linter just for this line
+    // eslint-disable-next-line sonarjs/pseudo-random
     const randomBook = books[Math.floor(Math.random() * books.length)]; //native JS random method
 
     if (!randomBook) return; //security line
